@@ -146,7 +146,7 @@ README_CONTENT = """
 
 ## Addressing Critical Connectivity Challenges
 
-Across South Asia, over 800 million people remain disconnected from the digital world, limiting access to education, healthcare, and economic opportunities. Public sector networks are essential lifelines, yet planning and implementing these systems often remains a technical barrier for community leaders.
+Across South Asia, over 900 million people remain disconnected from the digital world, limiting access to education, healthcare, and economic opportunities. Public sector networks are essential lifelines, yet planning and implementing these systems often remains a technical barrier for community leaders.
 
 ConnectSense was created to democratize connectivity expertise, empowering local decision-makers to bring sustainable digital access to underserved communities.
 
