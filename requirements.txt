@@ -1,0 +1,8 @@
+streamlit
+llama-index
+llama-index-llms-groq
+llama-index-llms-gemini
+llama-index-embeddings-gemini
+llama-index-vector-stores-faiss
+python-dotenv
+faiss-cpu
