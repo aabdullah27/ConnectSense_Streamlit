@@ -107,12 +107,27 @@ if st.session_state.show_readme:
             st.rerun()
 else:
     # Display the title only when not showing README
-    st.title("ConnectSense Chatbot 🤖")
+    st.title("ConnectSense Chatbot 🔗")
     
-    # Display chat messages
-    for message in st.session_state.chat_history:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    # Add static buttons above the chat input
+    st.write("")  # Add a small space for better layout
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.button("📊 Resource Allocation", key="button1", help="Resource Allocation", disabled=True, use_container_width=True)
+    with col2:
+        st.button("📚 Non-Technical Guides", key="button2", help="Non-Technical Guides", disabled=True, use_container_width=True)
+    with col3:
+        st.button("🌐 Connectivity Helper", key="button3", help="Connectivity Helper", disabled=True, use_container_width=True)
+    with col4:
+        st.button("🔧 Troubleshooting Tips", key="button4", help="Troubleshooting Tips", disabled=True, use_container_width=True)
+    st.write("")  # Add a small space for better layout
+
+    # Display chat messages in a container
+    chat_container = st.container()
+    with chat_container:
+        for message in st.session_state.chat_history:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
 
     # Chat input
     user_input = st.chat_input("Ask about your documents...")
@@ -123,50 +138,54 @@ else:
         st.session_state.chat_history.append({"role": "user", "content": user_input})
         
         # Display user message
-        with st.chat_message("user"):
-            st.markdown(user_input)
+        with chat_container:
+            with st.chat_message("user"):
+                st.markdown(user_input)
         
         # Generate and display assistant response
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking...", show_time=True):
-                try:
-                    # Build context from recent messages (last 5 interactions / 10 messages)
-                    context_str = ""
-                    if st.session_state.chat_history:
-                        recent = st.session_state.chat_history[-10:]
-                        for i in range(0, len(recent), 2):
-                            if i+1 < len(recent):
-                                context_str += f"### Previous Interaction:\n**User**: {recent[i]['content']}\n**Assistant**: {recent[i+1]['content']}\n\n"
-                    
-                    # Combine system prompt, context, and current question
-                    full_query = f"{SYSTEM_PROMPT}\n\n{context_str}\n### New Question:\n{user_input}"
-                    
-                    # Execute query with the full query as input
-                    response = st.session_state.query_engine.query(full_query)
-                    response_text = str(response)
-                    
-                    st.markdown(response_text)
-                    
-                    # Add assistant message to chat history
-                    st.session_state.chat_history.append({"role": "assistant", "content": response_text})
-                    
-                except Exception as e:
-                    error_msg = f"Error: {str(e)}"
-                    st.markdown(error_msg)
-                    st.session_state.chat_history.append({"role": "assistant", "content": error_msg})
+        with chat_container:
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking...", show_time=True):
+                    try:
+                        # Build context from recent messages (last 5 interactions / 10 messages)
+                        context_str = ""
+                        if st.session_state.chat_history:
+                            recent = st.session_state.chat_history[-10:]
+                            for i in range(0, len(recent), 2):
+                                if i+1 < len(recent):
+                                    context_str += f"### Previous Interaction:\n**User**: {recent[i]['content']}\n**Assistant**: {recent[i+1]['content']}\n\n"
+                        
+                        # Combine system prompt, context, and current question
+                        full_query = f"{SYSTEM_PROMPT}\n\n{context_str}\n### New Question:\n{user_input}"
+                        
+                        # Execute query with the full query as input
+                        response = st.session_state.query_engine.query(full_query)
+                        response_text = str(response)
+                        
+                        st.markdown(response_text)
+                        
+                        # Add assistant message to chat history
+                        st.session_state.chat_history.append({"role": "assistant", "content": response_text})
+                        
+                    except Exception as e:
+                        error_msg = f"Error: {str(e)}"
+                        st.markdown(error_msg)
+                        st.session_state.chat_history.append({"role": "assistant", "content": error_msg})
     elif user_input and st.session_state.query_engine is None:
         # Add user message to chat history
         st.session_state.chat_history.append({"role": "user", "content": user_input})
         
         # Display user message
-        with st.chat_message("user"):
-            st.markdown(user_input)
+        with chat_container:
+            with st.chat_message("user"):
+                st.markdown(user_input)
         
         # Generate and display assistant response
-        with st.chat_message("assistant"):
-            error_msg = "System initialization failed. Please check the application logs for more information."
-            st.markdown(error_msg)
-            st.session_state.chat_history.append({"role": "assistant", "content": error_msg})
+        with chat_container:
+            with st.chat_message("assistant"):
+                error_msg = "System initialization failed. Please check the application logs for more information."
+                st.markdown(error_msg)
+                st.session_state.chat_history.append({"role": "assistant", "content": error_msg})
 
 # Simple footer - Always visible
 st.caption("ConnectSense System © 2025 🌐")
