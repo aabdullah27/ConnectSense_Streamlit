@@ -39,7 +39,7 @@ if "primary_llm" not in st.session_state:
     st.session_state.primary_llm = None
 
 if "show_readme" not in st.session_state:
-    st.session_state.show_readme = False
+    st.session_state.show_readme = True  # Start with README visible by default
 
 # ConnectSense README content
 readme_content = README_CONTENT
@@ -80,9 +80,10 @@ if st.session_state.query_engine is None:
 with st.sidebar:
     st.header("System Controls ⚙️")
     
-    # README button
-    if st.button("README"):
+    # README button with toggle functionality
+    if st.button(f"{'📚 Show Chatbot' if st.session_state.show_readme else '📖 Show README'}"):
         st.session_state.show_readme = not st.session_state.show_readme
+        st.rerun()
     
     # Show system status
     if st.session_state.query_engine is not None:
@@ -91,17 +92,24 @@ with st.sidebar:
         st.error("System initialization failed")
     
     # Clear chat button in sidebar
-    if st.button("Clear Chat"):
+    if st.button("🧹 Clear Chat"):
         st.session_state.chat_history = []
         st.rerun()
 
 # Main content area
 if st.session_state.show_readme:
-    # Show README content only
+    # Show README content with a continue button
     st.markdown(readme_content)
+    
+    # Add a centered continue button
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("🚀 Continue to Chatbot", use_container_width=True):
+            st.session_state.show_readme = False
+            st.rerun()
 else:
     # Display the title only when not showing README
-    st.title("ConnectSense Chatbot")
+    st.title("ConnectSense Chatbot 🤖")
     
     # Display chat messages
     for message in st.session_state.chat_history:
@@ -163,4 +171,4 @@ else:
             st.session_state.chat_history.append({"role": "assistant", "content": error_msg})
 
 # Simple footer - Always visible
-st.caption("ConnectSense System © 2025")
+st.caption("ConnectSense System © 2025 🌐")
