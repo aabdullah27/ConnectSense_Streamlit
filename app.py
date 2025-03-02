@@ -85,10 +85,8 @@ with st.sidebar:
         st.session_state.show_readme = not st.session_state.show_readme
         st.rerun()
     
-    # Show system status
-    if st.session_state.query_engine is not None:
-        st.success(f"System Ready - Using {st.session_state.primary_llm}")
-    else:
+    # Show system status (hidden from the user, handled in backend)
+    if st.session_state.query_engine is None:
         st.error("System initialization failed")
     
     # Clear chat button in sidebar
