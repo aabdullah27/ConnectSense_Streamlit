@@ -142,16 +142,6 @@ st.markdown("""
         padding-bottom: 10px;
         border-bottom: 1px solid rgba(128, 128, 128, 0.3);
     }
-    
-    /* Admin-only status display in sidebar */
-    .admin-status {
-        font-size: 0.8em;
-        padding: 8px;
-        border-radius: 6px;
-        background-color: rgba(0, 0, 0, 0.05);
-        margin-top: 20px;
-        border-left: 3px solid #888;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -172,14 +162,21 @@ if st.session_state.query_engine is None:
                 llm = Groq(api_key=GROQ_API_KEY, model=GROQ_MODEL, temperature=0.5)
                 Settings.llm = llm
                 st.session_state.primary_llm = "Groq"
-            except Exception:
-                st.warning("Groq initialization failed. Falling back to Gemini.")
-                llm = Gemini(model=GEMINI_MODEL, api_key=GOOGLE_API_KEY, temperature=0.5)
-                Settings.llm = llm
-                st.session_state.primary_llm = "Gemini"
+            except Exception as e:
+                st.warning(f"Groq initialization failed: {str(e)}. Falling back to Gemini.")
+                try:
+                    llm = Gemini(model=GEMINI_MODEL, api_key=GOOGLE_API_KEY, temperature=0.5)
+                    Settings.llm = llm
+                    st.session_state.primary_llm = "Gemini"
+                except Exception as e:
+                    st.error(f"Gemini initialization also failed: {str(e)}")
+                    st.session_state.primary_llm = None
             
-            # Set up query engine
-            st.session_state.query_engine = index.as_query_engine(similarity_top_k=3)
+            # Set up query engine if LLM is initialized
+            if st.session_state.primary_llm:
+                st.session_state.query_engine = index.as_query_engine(similarity_top_k=3)
+            else:
+                st.error("No LLM available. Please check your API keys and try again.")
             
         except Exception as e:
             st.error(f"Error initializing application: {str(e)}")
@@ -211,13 +208,6 @@ with st.sidebar:
     if st.button("🧹 Clear Conversation", use_container_width=True):
         st.session_state.chat_history = []
         st.rerun()
-    
-    # Admin-only status info - small and subtle at bottom of sidebar
-    if st.session_state.query_engine is not None:
-        st.markdown(
-            f'<div class="admin-status">System: {st.session_state.primary_llm}</div>',
-            unsafe_allow_html=True
-        )
 
 # Main content area
 if st.session_state.show_readme:
